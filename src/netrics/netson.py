@@ -14,6 +14,7 @@ from pathlib import Path
 from tinydb import TinyDB, where
 from tinydb.operations import increment
 from tinydb.operations import set as tdb_set
+from yvl import *
 
 log = logging.getLogger(__name__)
 
@@ -707,7 +708,7 @@ class Measurements:
         return dig_res
 
     
-    def store_youtube_data(self, key, run_test):
+    def store_youtube_data(self, key, run_test, id, link, headless, mode):
         """
         Store youtube data to influxDB
         """
@@ -716,21 +717,28 @@ class Measurements:
         if not run_test:
             return
 
+        stats_dict = initializeAndRun(id, link, headless, mode)
+        # yt_cmd = "python3 src/yvl.py --id 1 --link https://www.youtube.com/watch?v=-W9F__D3oY4 --headless true --mode run"
+        # stats_dict = {}
+        # stats_dict, err = self.popen_exec(yt_cmd)
+        
+        # print(err)
         # Replicating youtube stats for nerds data.
-        self.results[key] = {}
-        self.results[key]['playback_progress'] =1.71
-        self.results[key]['current_optimal_res'] = "328x240@30 / 328x240@30"
-        self.results[key]['timestamp'] = 1631097336.45493
-        self.results[key]['buffer_health'] = 14.39
-        self.results[key]['viewport_frames'] = "894x654 / 2 dropped of 13Current /"
+        self.results[key] = stats_dict
+        # self.results[key]['playback_progress'] =1.71
+        # self.results[key]['current_optimal_res'] = "328x240@30 / 328x240@30"
+        # self.results[key]['timestamp'] = 1631097336.45493
+        # self.results[key]['buffer_health'] = 14.39
+        # self.results[key]['viewport_frames'] = "894x654 / 2 dropped of 13Current /"
+        
+        print(stats_dict)
 
         if not self.quiet:
             print(f'\n --- Youtube Data ---')
-            print(f'Data written: {self.results[key]["random_data"]}')
+            # print(f'Data written: {self.results[key]["random_data"]}')
             # print(f'Max DNS Query Time: {self.results[key]["dns_query_max_ms"]} ms')
 
-        obj = {}
-        return obj
+        return stats_dict
 
     def hops_to_target(self, key, site):
         """
